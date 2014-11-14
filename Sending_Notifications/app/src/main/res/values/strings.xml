@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">glowGlass</string>
+    <string name="hello_world">Ignore UI first, let's try sending text infos to a bluetooth connected device</string>
+    <string name="action_settings">Settings</string>
+
+</resources>
