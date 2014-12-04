@@ -1,0 +1,29 @@
+{
+	protocol:{
+		name:"feedback",
+		version:0.1,
+	},
+	message:{
+		type:"motion",//audio, touch, etc
+		parameter:"whatever parameters"
+	}
+}
+{
+	protocol:{
+		name:"error",
+		version:0.1,
+	},
+	message:{
+		errorNo:200
+	}
+}
+{
+	protocol:{
+		name:"control",
+		version:0.1
+	},
+	message:{
+		command:"battery-status",//checkalive, etc
+		parameter:"20%"
+	}
+}

@@ -1,0 +1,49 @@
+{
+	protocol:{
+		name:"display",
+		version:0.1,
+	},
+	message:{
+		styleId:"style1",
+		text:"msg content"
+	}
+}
+{
+	protocol:{
+		name:"display-part",
+		version:0.1,
+	},
+	message:{
+		styleId:"style1",
+		text:"msg content"
+	}
+}
+{
+	protocol:{
+		name:"display-end",
+		version:0.1,
+	},
+	message:{
+		styleId:"style1",
+		text:"msg content"
+	}
+}
+{
+	protocol:{
+		name:"control",
+		version:0.1,
+	},
+	message:{
+		command:"sync",//update, checkalive, etc
+		parameter:"files"
+	}
+}
+{
+	protocol:{
+		name:"error",
+		version:0.1,
+	},
+	message:{
+		errorNo:200
+	}
+}
