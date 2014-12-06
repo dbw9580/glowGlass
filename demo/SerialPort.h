@@ -79,6 +79,10 @@
          */ 
         bool CloseListenTread();  
      
+		//bool OpenCheckaliveThread();
+
+		//bool CloseCheckaliveThread();
+
         /** 向串口写数据  
          *  
          *  将缓冲区中的数据写入到串口  
@@ -110,6 +114,8 @@
          *  @see:      
          */ 
         bool ReadChar(char &cRecved);  
+		/*ReadChar重载，直接返回读取的字符*/
+		unsigned char ReadChar();
      
     private:  
      
@@ -141,6 +147,8 @@
          *  @see:      
          */ 
         static UINT WINAPI ListenThread(void* pParam);  
+		
+		//static UINT WINAPI CheckaliveThread(void* pParam);
      
     private:  
      
@@ -149,7 +157,11 @@
      
         /** 线程退出标志变量 */   
         static bool s_bExit;  
-     
+		/*
+		static bool checkaliveExit;
+		
+		static unsigned char checkaliveRxData[150];
+		*/
         /** 线程句柄 */   
         volatile HANDLE    m_hListenThread;  
      
