@@ -9,8 +9,8 @@ int main(int argc, char agrv[])
 	//UINT numOfBytes;
 	//char strRx[100];
 	//int i;
-	unsigned char cmdin[100];
-	if (sp.InitPort(7, 115200))
+	unsigned char cmdin[200];
+	if (sp.InitPort(6, 115200))
 	{
 		/*
 		if (!sp.OpenListenThread())
@@ -19,24 +19,37 @@ int main(int argc, char agrv[])
 		}
 		*/
 		int i = 0;
+		UINT BytesToRecv = 0;
 		char data[100];
 		while (1)
 		{
+			
 			if (i == 8)
 			{
 				i = 0;
 			}
-			sprintf_s(data, "CLS(%d)", i);
+			sprintf_s(data, "SPG(%d);\r\n", i);
 
-			sp.WriteData((unsigned char*)data, 20);
-			sp.WriteData((unsigned char*)"\r\n");
+			sp.WriteData((unsigned char*)data, 10);
+			//sp.WriteData((unsigned char*)"\r\n");
 			i++;
-			Sleep(500);
+
+			BytesToRecv = sp.GetBytesInCOM();
+			if (BytesToRecv != 0)
+			{
+				for (UINT j = 0; j < BytesToRecv; j++)
+				{
+					cout << sp.ReadChar();
+				}
+			}
+			
+			Sleep(3000);
+			
 			/*
 			cin >> cmdin;
 			if (cmdin[0] != '0')
 			{
-				sp.WriteData(cmdin, 20);
+				sp.WriteData(cmdin, 200);
 				sp.WriteData((unsigned char*)"\r\n");
 			}
 			else

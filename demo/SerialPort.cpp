@@ -67,11 +67,12 @@ bool CSerialPort::InitPort( UINT portNo /*= 1*/,UINT baud /*= CBR_9600*/,char pa
     /** 在此可以设置输入输出的缓冲区大小,如果不设置,则系统会设置默认值.  
      *  自己设置缓冲区大小时,要注意设置稍大一些,避免缓冲区溢出  
      */ 
-    /*if (bIsSuccess )  
+	/*
+    if (bIsSuccess )  
     {  
-        bIsSuccess = SetupComm(m_hComm,10,10);  
-    }*/ 
- 
+        bIsSuccess = SetupComm(m_hComm,100,100);  
+    }
+	*/
     /** 设置串口的超时时间,均设为0,表示不使用超时限制 */ 
     COMMTIMEOUTS  CommTimeouts;  
     CommTimeouts.ReadIntervalTimeout         = 0;  
@@ -277,7 +278,22 @@ UINT WINAPI CSerialPort::ListenThread( void* pParam )
  
     return 0;  
 }  
- 
+/*
+UINT WINAPI CSerialPort::CheckaliveThread(void* pParam)
+{
+
+	CSerialPort *pSerialPort = reinterpret_cast<CSerialPort*>(pParam);
+
+	// 线程循环,轮询方式读取串口数据  
+	while (!pSerialPort->checkaliveExit)
+	{
+		pSerialPort->WriteData((unsigned char*)"INF\r\n");
+		if (pSerialPort->checkaliveRxData)
+	}
+
+	return 0;
+}
+*/
 bool CSerialPort::ReadChar( char &cRecved )  
 {  
     BOOL  bResult     = TRUE;  
@@ -311,6 +327,13 @@ bool CSerialPort::ReadChar( char &cRecved )
  
 }  
  
+unsigned char CSerialPort::ReadChar()
+{
+	char curChar = 0x00;
+	this->ReadChar(curChar);
+	return (unsigned char)curChar;
+
+}
 bool CSerialPort::WriteData( unsigned char* pData, unsigned int length )  
 {  
     BOOL   bResult     = TRUE;  
