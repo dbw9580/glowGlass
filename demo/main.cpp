@@ -1,5 +1,6 @@
 #include <iostream>
 #include "SerialPort.h"
+#include <string>
 //#include "stdafx.h"
 
 using namespace std;
@@ -9,7 +10,8 @@ int main(int argc, char agrv[])
 	//UINT numOfBytes;
 	//char strRx[100];
 	//int i;
-	unsigned char cmdin[200];
+	string cmdin;
+	
 	if (sp.InitPort(6, 115200))
 	{
 		/*
