@@ -1,7 +1,12 @@
 #include<Windows.h>
 #include<iostream>
-#include"config.h"
+#include"OnlyMyConfig.h"
 #pragma comment(lib,"ws2_32.lib")
+
+//using OnlyMyConfig::Config;
+//using OnlyMyConfig::COMConfig;
+//using OnlyMyConfig::StyleConfig;
+//using OnlyMyConfig::SocketConfig;
 
 class Network
 {
@@ -10,7 +15,7 @@ public:
 	~Network();
 	bool init();
 	bool startListen();
-	int write(const char* wbuf, unsigned int length);
+	//int write(const char* wbuf, unsigned int length);
 	int read();
 	bool close();
 
@@ -20,4 +25,5 @@ private:
 	
 	SOCKET conn, server;
 	SocketConfig config;
+	char* readBuffer = NULL;
 };

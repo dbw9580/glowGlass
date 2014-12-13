@@ -9,7 +9,7 @@ Network::Network(SocketConfig& conf)
 	err = WSAStartup(myVersionRequest, &wsaData);
 	if (!err)
 	{
-		std::cerr << "socket opened!" << std::endl;
+		std::cerr << "socket opened on port: " << conf.port << std::endl;
 		config = conf;
 	}
 	else
@@ -48,7 +48,7 @@ bool Network::startListen()
 	SOCKADDR_IN clientsocket;
 	int len = sizeof(SOCKADDR);
 	conn = accept(server, (SOCKADDR*)&clientsocket, &len);
-	std::cout << "accepted!" << std::endl;
+	std::cout << "client accepted!" << std::endl;
 
 	return true;
 }
@@ -56,7 +56,36 @@ bool Network::startListen()
 int Network::read()
 {
 	rbuf = "";
-	char* recvBuf = new char[config.rbuff];
+	readBuffer = new char[config.rbuff+1];
+	memset(readBuffer, 0, sizeof(char)*(config.rbuff + 1));
+	int recvlen = 0;
 
+	while (recvlen = recv(conn, readBuffer, config.rbuff, 0))
+	{
+
+		if (recvlen == config.rbuff)
+		{
+			readBuffer[config.rbuff] = 0;
+			rbuf.append(readBuffer);
+			memset(readBuffer, 0, sizeof(char)*(config.rbuff+1));
+			continue;
+		}
+		else
+		{
+			if (recvlen < config.rbuff && recvlen >= 0)
+			{
+				readBuffer[recvlen] = 0;
+				rbuf.append(readBuffer);
+				delete[] readBuffer;
+				break;
+			}
+			else
+			{
+				std::cerr << "socket read error!" << std::endl;
+				break;
+			}
+		}
+	}
+	return rbuf.length();
 
 }

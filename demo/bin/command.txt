@@ -1,0 +1,1 @@
+{"protocol":{"name":"display","version":0.1},"message":{"styleID":"1","text":"msg content"}}

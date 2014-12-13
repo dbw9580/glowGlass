@@ -1,18 +1,27 @@
+#pragma once
+
+#include"json/json.h"
+#include"network.h"
+#include "SerialPort.h"
 #include<windows.h>
 #pragma comment(lib,"ws2_32.lib")
 #include<iostream>
 #include<string>
 #include<fstream>
-#include"json/json.h"
 #pragma comment(lib,"lib_json.lib")
-#include "SerialPort.h"
 #include<map>
-#include"config.h"
+
+
 using namespace std;
+//using OnlyMyConfig::Config;
+//using OnlyMyConfig::COMConfig;
+//using OnlyMyConfig::StyleConfig;
+//using OnlyMyConfig::SocketConfig;
 
 int loadConfig(const char* filepath, Config& config);
 int initComm(COMConfig& conf, CSerialPort& sp);
-int initSocket(SocketConfig& conf);
+string parseCommand(const string& cmd, const StyleConfig& style);
+inline void CSreplace(std::string& s1, std::string& s2, std::string& s3, int count);
 int main()
 {
 	char filepath[20];
@@ -24,6 +33,22 @@ int main()
 		if (initComm(config.com, sp) == 0)
 		{
 			std::cout << "COM" << config.com.num << "opened!" << std::endl;
+			Network net(config.sock);
+			if (net.init())
+			{
+				while (1)
+				{
+					net.startListen();
+					while (net.read() != 0)
+					{
+						string res = parseCommand(net.rbuf, config.style);
+						sp.WriteData((unsigned char*)res.c_str(), res.length());
+						sp.WriteData((unsigned char*)"\r\n");
+						cout << res << endl;
+					}
+
+				}
+			}
 
 		}
 		else
@@ -46,28 +71,28 @@ int loadConfig(const char* filepath, Config& config)
 	confFile.open(filepath);
 	if (!confFile.is_open())
 	{
-		cerr << "could not open config file" << endl;
+		cerr << "could not open config file: " << filepath << endl;
 		return -1;
 	}
 	else
 	{
-		cout << "config file opened!" << endl;
+		cout << "config file opened" << endl;
 	}
 
 	confFile.seekg(0, ios::end);
 	int fileLen = confFile.tellg();
 	char *confStr = NULL;
-	confStr = new char[fileLen + 1];
+	confStr = new char[fileLen+1];
 	confFile.seekg(0, ios::beg);
-	confFile >> confStr;
-	confStr[fileLen] = 0;
+	confFile.get(confStr, fileLen+1);
+	//confStr[fileLen] = 0;
 
 	Json::Reader reader;
 	Json::Value confRoot;
 
 	if (!reader.parse(confStr, confRoot))
 	{
-		cerr << "error parsing config file!" << endl << reader.getFormattedErrorMessages() << endl;
+		cerr << "error parsing config file: " << endl << reader.getFormattedErrorMessages() << endl;
 		return -2;
 	}
 	else
@@ -100,4 +125,75 @@ int initComm(COMConfig& conf, CSerialPort& sp)
 	}
 
 	return 0;
+}
+
+string parseCommand(const string& cmd, const StyleConfig& style)
+{
+	Json::Reader reader;
+	Json::Value root;
+
+	std::ifstream styleFile;
+	if (reader.parse(cmd, root))
+	{
+		string styleType = root["message"]["styleID"].asString();
+		map<string, string>::const_iterator itr = style.styles.find(styleType);
+		if (itr != style.styles.end())
+		{
+			styleFile.open(itr->second);
+			if (styleFile.good())
+			{
+				styleFile.seekg(0, ios::end);
+				int fileLen = styleFile.tellg();
+				char* inBuf = new char[fileLen + 1];
+				styleFile.seekg(0, ios::beg);
+				styleFile.get(inBuf, fileLen +1);
+				memset(inBuf + fileLen, 0, sizeof(char));
+				styleFile.close();
+				string resStr(inBuf);
+
+				CSreplace(resStr, string("%s"), root["message"]["text"].asString(), -1);
+
+				delete[] inBuf;
+				return resStr;
+			}
+			else
+			{
+				cerr << "failed to open style definition: " << itr->second << endl;
+			}
+		}
+		else
+		{
+			cerr << "undefined style ID: " << itr->first << endl;
+		}
+	}
+	else
+	{
+		cerr << "failed to parse command, check your syntax: " << cmd << reader.getFormattedErrorMessages() << endl;
+	}
+	
+	return string("");
+}
+inline void CSreplace(std::string& s1, std::string& s2, std::string& s3, int count)
+{
+	std::string::size_type pos = 0;
+	std::string::size_type a = s2.size();
+	std::string::size_type b = s3.size();
+
+	if (count == -1){
+		while ((pos = s1.find(s2, pos)) != std::string::npos)
+		{
+			s1.replace(pos, a, s3);
+			pos += b;
+		}
+	}
+	else{
+		int c = 0;
+		while ((pos = s1.find(s2, pos)) != std::string::npos)
+		{
+			s1.replace(pos, a, s3);
+			pos += b;
+			if (++c == count)
+				return;
+		}
+	}
 }
