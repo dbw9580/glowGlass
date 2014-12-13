@@ -10,8 +10,12 @@ int main(int argc, char agrv[])
 	//UINT numOfBytes;
 	//char strRx[100];
 	//int i;
+<<<<<<< HEAD
 	string cmdin;
 	
+=======
+	unsigned char cmdin[200];
+>>>>>>> 7cf1cada536f01404768fc3db7020e41aecfa1cb
 	if (sp.InitPort(6, 115200))
 	{
 		/*
