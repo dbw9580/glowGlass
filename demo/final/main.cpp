@@ -151,7 +151,20 @@ string parseCommand(const string& cmd, const StyleConfig& style)
 				styleFile.close();
 				string resStr(inBuf);
 
-				CSreplace(resStr, string("%s"), root["message"]["text"].asString(), -1);
+				Json::Value text = root["message"]["text"];
+				if (root["message"]["text"].isArray())
+				{
+					for (unsigned int i = 0; i < text.size(); i++)
+					{
+						CSreplace(resStr, string("%s"), text[i].asString(), 1);
+					}
+				}
+				else
+				{
+					CSreplace(resStr, string("%s"), text.asString(), -1);
+				}
+				
+				
 
 				delete[] inBuf;
 				return resStr;

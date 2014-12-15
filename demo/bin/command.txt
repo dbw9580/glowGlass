@@ -1,1 +1,1 @@
-{"protocol":{"name":"display","version":0.1},"message":{"styleID":"1","text":"msg content"}}
+{"protocol":{"name":"display","version":0.1},"message":{"styleID":"4","text":["Alice","17:10","Re:Dinner plan","Sorry I have to cancel the dinner plan..."]}}
